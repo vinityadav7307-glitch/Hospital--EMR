@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctors — Meridian Health</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand"><span class="mark">M</span><span class="name">Meridian</span></div>
+    <div class="sidebar-role">Admin Panel</div>
+    <nav class="sidebar-nav">
+      <a href="admin-dashboard.html"><i class="bi bi-grid-1x2"></i> Dashboard</a>
+      <a href="doctors.html"><i class="bi bi-person-badge"></i> Doctors</a>
+      <a href="patients.html"><i class="bi bi-people"></i> Patients</a>
+      <a href="departments.html"><i class="bi bi-diagram-3"></i> Departments</a>
+      <a href="appointments.html"><i class="bi bi-calendar2-week"></i> Appointments</a>
+      <a href="visits.html"><i class="bi bi-clipboard2-pulse"></i> Visits</a>
+      <a href="prescriptions.html"><i class="bi bi-capsule"></i> Prescriptions</a>
+      <a href="billing.html"><i class="bi bi-receipt"></i> Billing</a>
+      <a href="audit-logs.html"><i class="bi bi-journal-text"></i> Audit Logs</a>
+      <a href="settings.html"><i class="bi bi-gear"></i> Settings</a>
+    </nav>
+    <div class="sidebar-foot"><a href="index.html"><i class="bi bi-box-arrow-left"></i> Logout</a></div>
+  </aside>
+
+  <div class="main-col">
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="sidebar-toggle" data-sidebar-toggle><i class="bi bi-list"></i></button>
+        <span class="page-title">Doctors</span>
+      </div>
+      <div class="user-chip"><span class="text-muted-soft small d-none d-sm-inline">Admin User</span><div class="avatar">AU</div></div>
+    </header>
+
+    <main class="content">
+      <div class="panel">
+        <div class="panel-head flex-wrap gap-2">
+          <h2>All Doctors</h2>
+          <div class="d-flex gap-2 flex-wrap">
+            <select class="form-select form-select-sm" id="deptFilter" style="width:auto;">
+              <option value="">All Departments</option>
+            </select>
+            <div class="input-group input-group-sm" style="width:220px;">
+              <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+              <input type="text" class="form-control" id="doctorSearch" placeholder="Search doctors...">
+            </div>
+            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#doctorModal" onclick="openAddDoctor()"><i class="bi bi-plus-lg me-1"></i>Add Doctor</button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table-clean mb-0">
+            <thead><tr><th>ID</th><th>Name</th><th>Department</th><th>Specialization</th><th>Contact</th><th>Status</th><th></th></tr></thead>
+            <tbody id="doctorsBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="doctorsEmpty" style="display:none;"><i class="bi bi-person-x"></i>No doctors match your search.</div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Add / Edit Doctor Modal -->
+<div class="modal fade" id="doctorModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="doctorForm">
+        <div class="modal-header">
+          <h5 class="modal-title font-display" id="doctorModalTitle">Add Doctor</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="doctorId">
+          <div class="mb-3 was-validated-field">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="doctorName" required placeholder="Dr. Jane Doe">
+            <div class="invalid-msg">Doctor name is required.</div>
+          </div>
+          <div class="row g-3">
+            <div class="col-6 was-validated-field">
+              <label class="form-label">Department</label>
+              <select class="form-select" id="doctorDept" required></select>
+              <div class="invalid-msg">Select a department.</div>
+            </div>
+            <div class="col-6 was-validated-field">
+              <label class="form-label">Status</label>
+              <select class="form-select" id="doctorStatus" required>
+                <option>Active</option>
+                <option>On Leave</option>
+                <option>Inactive</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-3 mt-3 was-validated-field">
+            <label class="form-label">Specialization</label>
+            <input type="text" class="form-control" id="doctorSpec" required placeholder="e.g. Interventional Cardiology">
+            <div class="invalid-msg">Specialization is required.</div>
+          </div>
+          <div class="row g-3">
+            <div class="col-6 was-validated-field">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" id="doctorEmail" required>
+              <div class="invalid-msg">Valid email required.</div>
+            </div>
+            <div class="col-6 was-validated-field">
+              <label class="form-label">Phone</label>
+              <input type="tel" class="form-control" id="doctorPhone" required>
+              <div class="invalid-msg">Phone is required.</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost border" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Doctor</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- View Doctor Modal -->
+<div class="modal fade" id="viewDoctorModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title font-display">Doctor Details</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body" id="viewDoctorBody"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation -->
+<div class="modal fade" id="deleteDoctorModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title font-display">Remove Doctor</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">Are you sure you want to remove <strong id="deleteDoctorName"></strong>? This cannot be undone.</div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost border" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn" style="background:var(--danger);color:#fff;" id="confirmDeleteDoctor">Remove</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/mockData.js"></script>
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script>
+  let doctors = [...MOCK.doctors]; // local working copy of mock data
+  let deleteTargetId = null;
+
+  // Populate department filter + form dropdown
+  const deptFilter = document.getElementById("deptFilter");
+  const doctorDept = document.getElementById("doctorDept");
+  MOCK.departments.forEach(d => {
+    deptFilter.innerHTML += `<option value="${d.name}">${d.name}</option>`;
+    doctorDept.innerHTML += `<option value="${d.name}">${d.name}</option>`;
+  });
+
+  function renderDoctors() {
+    const body = document.getElementById("doctorsBody");
+    const q = document.getElementById("doctorSearch").value.toLowerCase();
+    const dept = deptFilter.value;
+    const filtered = doctors.filter(d =>
+      (!dept || d.department === dept) &&
+      (d.name.toLowerCase().includes(q) || d.specialization.toLowerCase().includes(q))
+    );
+    document.getElementById("doctorsEmpty").style.display = filtered.length ? "none" : "block";
+    body.innerHTML = filtered.map(d => `
+      <tr>
+        <td class="text-faint">${d.id}</td>
+        <td class="fw-semibold">${d.name}</td>
+        <td>${d.department}</td>
+        <td>${d.specialization}</td>
+        <td class="small">${d.phone}<br><span class="text-faint">${d.email}</span></td>
+        <td><span class="badge-status ${statusBadgeClass(d.status)}">${d.status}</span></td>
+        <td class="text-end">
+          <button class="btn btn-sm btn-ghost border" onclick="viewDoctor('${d.id}')"><i class="bi bi-eye"></i></button>
+          <button class="btn btn-sm btn-ghost border" onclick="editDoctor('${d.id}')"><i class="bi bi-pencil"></i></button>
+          <button class="btn btn-sm btn-ghost border" onclick="confirmDeleteDoctor('${d.id}')"><i class="bi bi-trash text-danger"></i></button>
+        </td>
+      </tr>`).join("");
+  }
+  renderDoctors();
+  document.getElementById("doctorSearch").addEventListener("input", renderDoctors);
+  deptFilter.addEventListener("change", renderDoctors);
+
+  function openAddDoctor() {
+    document.getElementById("doctorForm").reset();
+    document.getElementById("doctorId").value = "";
+    document.getElementById("doctorModalTitle").textContent = "Add Doctor";
+  }
+
+  function editDoctor(id) {
+    const d = doctors.find(x => x.id === id);
+    document.getElementById("doctorModalTitle").textContent = "Edit Doctor";
+    document.getElementById("doctorId").value = d.id;
+    document.getElementById("doctorName").value = d.name;
+    document.getElementById("doctorDept").value = d.department;
+    document.getElementById("doctorStatus").value = d.status;
+    document.getElementById("doctorSpec").value = d.specialization;
+    document.getElementById("doctorEmail").value = d.email;
+    document.getElementById("doctorPhone").value = d.phone;
+    new bootstrap.Modal(document.getElementById("doctorModal")).show();
+  }
+
+  function viewDoctor(id) {
+    const d = doctors.find(x => x.id === id);
+    document.getElementById("viewDoctorBody").innerHTML = `
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="avatar-sm" style="width:48px;height:48px;font-size:1rem;">${d.name.split(" ").map(w=>w[0]).slice(0,2).join("")}</div>
+        <div><div class="fw-semibold">${d.name}</div><div class="small text-muted-soft">${d.specialization}</div></div>
+      </div>
+      <div class="row g-2 small">
+        <div class="col-6 text-faint">Doctor ID</div><div class="col-6">${d.id}</div>
+        <div class="col-6 text-faint">Department</div><div class="col-6">${d.department}</div>
+        <div class="col-6 text-faint">Email</div><div class="col-6">${d.email}</div>
+        <div class="col-6 text-faint">Phone</div><div class="col-6">${d.phone}</div>
+        <div class="col-6 text-faint">Status</div><div class="col-6"><span class="badge-status ${statusBadgeClass(d.status)}">${d.status}</span></div>
+      </div>`;
+    new bootstrap.Modal(document.getElementById("viewDoctorModal")).show();
+  }
+
+  function confirmDeleteDoctor(id) {
+    const d = doctors.find(x => x.id === id);
+    deleteTargetId = id;
+    document.getElementById("deleteDoctorName").textContent = d.name;
+    new bootstrap.Modal(document.getElementById("deleteDoctorModal")).show();
+  }
+  document.getElementById("confirmDeleteDoctor").addEventListener("click", async () => {
+    // TODO: Connect this function to your backend API (DoctorService.remove)
+    await DoctorService.remove(deleteTargetId);
+    doctors = doctors.filter(d => d.id !== deleteTargetId);
+    renderDoctors();
+    bootstrap.Modal.getInstance(document.getElementById("deleteDoctorModal")).hide();
+    showToast("Doctor removed.", "success");
+  });
+
+  document.getElementById("doctorForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!validateForm(e.target)) return;
+    const id = document.getElementById("doctorId").value;
+    const payload = {
+      id: id || "DOC-" + Math.floor(100 + Math.random() * 900),
+      name: document.getElementById("doctorName").value,
+      department: document.getElementById("doctorDept").value,
+      status: document.getElementById("doctorStatus").value,
+      specialization: document.getElementById("doctorSpec").value,
+      email: document.getElementById("doctorEmail").value,
+      phone: document.getElementById("doctorPhone").value,
+    };
+    if (id) {
+      // TODO: Connect this function to your backend API (DoctorService.update)
+      await DoctorService.update(id, payload);
+      doctors = doctors.map(d => d.id === id ? payload : d);
+      showToast("Doctor updated.", "success");
+    } else {
+      // TODO: Connect this function to your backend API (DoctorService.create)
+      await DoctorService.create(payload);
+      doctors.unshift(payload);
+      showToast("Doctor added.", "success");
+    }
+    renderDoctors();
+    bootstrap.Modal.getInstance(document.getElementById("doctorModal")).hide();
+  });
+</script>
+</body>
+</html>

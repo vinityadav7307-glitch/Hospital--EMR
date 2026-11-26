@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Appointment — Meridian Health</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+</head>
+<body style="background:var(--bg);">
+
+<nav class="navbar bg-white border-bottom py-3">
+  <div class="container">
+    <a class="navbar-brand-custom" href="index.html"><span class="mark"><i class="bi bi-heart-pulse"></i></span> Meridian Health</a>
+    <a href="patient-dashboard.html" class="btn btn-ghost border btn-sm">My Dashboard</a>
+  </div>
+</nav>
+
+<div class="container py-5" style="max-width:720px;">
+  <h1 class="font-display mb-1">Book an Appointment</h1>
+  <p class="text-muted-soft mb-4">Time slots shown are for demonstration only — real availability and double-booking checks are enforced by the backend.</p>
+
+  <div class="panel p-4">
+
+    <!-- Step indicator -->
+    <div class="d-flex justify-content-between mb-4 small text-muted-soft" id="stepIndicator">
+      <span class="fw-semibold text-dark">1. Department</span>
+      <span>2. Doctor</span>
+      <span>3. Date &amp; Time</span>
+      <span>4. Confirm</span>
+    </div>
+
+    <!-- Step 1: Department -->
+    <div id="step1">
+      <label class="form-label">Select a department</label>
+      <div class="row g-2" id="deptOptions"></div>
+      <div class="d-flex justify-content-end mt-4">
+        <button class="btn btn-primary" onclick="goStep(2)" id="step1Next" disabled>Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Doctor -->
+    <div id="step2" style="display:none;">
+      <label class="form-label">Select a doctor</label>
+      <div class="row g-2" id="doctorOptions"></div>
+      <div class="d-flex justify-content-between mt-4">
+        <button class="btn btn-ghost border" onclick="goStep(1)">Back</button>
+        <button class="btn btn-primary" onclick="goStep(3)" id="step2Next" disabled>Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Date & Time -->
+    <div id="step3" style="display:none;">
+      <div class="mb-3 was-validated-field">
+        <label class="form-label">Appointment Date</label>
+        <input type="date" class="form-control" id="apptDate" required>
+        <div class="invalid-msg">Please select a date.</div>
+      </div>
+      <label class="form-label">Available Time Slots</label>
+      <div class="d-flex flex-wrap gap-2 mb-3" id="slotOptions"></div>
+      <div class="mb-3 was-validated-field">
+        <label class="form-label">Reason for Visit</label>
+        <textarea class="form-control" id="apptReason" rows="3" required placeholder="Briefly describe your symptoms or reason for visit"></textarea>
+        <div class="invalid-msg">Please enter a reason for the visit.</div>
+      </div>
+      <div class="d-flex justify-content-between mt-2">
+        <button class="btn btn-ghost border" onclick="goStep(2)">Back</button>
+        <button class="btn btn-primary" onclick="reviewBooking()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 4: Confirm -->
+    <div id="step4" style="display:none;">
+      <div class="panel p-3 mb-3" style="background:var(--bg);">
+        <div class="row g-2 small">
+          <div class="col-5 text-faint">Department</div><div class="col-7" id="confDept"></div>
+          <div class="col-5 text-faint">Doctor</div><div class="col-7" id="confDoctor"></div>
+          <div class="col-5 text-faint">Date</div><div class="col-7" id="confDate"></div>
+          <div class="col-5 text-faint">Time</div><div class="col-7" id="confTime"></div>
+          <div class="col-5 text-faint">Reason</div><div class="col-7" id="confReason"></div>
+        </div>
+      </div>
+      <div class="d-flex justify-content-between">
+        <button class="btn btn-ghost border" onclick="goStep(3)">Back</button>
+        <button class="btn btn-primary" id="confirmBookBtn" onclick="confirmBooking()">Confirm Appointment</button>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div id="stepSuccess" style="display:none;" class="text-center py-3">
+      <i class="bi bi-check-circle text-success" style="font-size:2.6rem;"></i>
+      <h2 class="font-display mt-3">Appointment Requested</h2>
+      <p class="text-muted-soft">Your appointment <strong id="successId"></strong> has been submitted and is <span class="badge-status badge-scheduled">Scheduled</span>. You'll receive a confirmation once the clinic reviews it.</p>
+      <a href="patient-dashboard.html" class="btn btn-primary mt-2">Go to My Dashboard</a>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/mockData.js"></script>
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script>
+  const booking = { department: null, doctor: null, date: null, time: null, reason: null };
+  const steps = ["1. Department","2. Doctor","3. Date & Time","4. Confirm"];
+
+  function goStep(n) {
+    for (let i=1;i<=4;i++) document.getElementById("step"+i).style.display = (i===n) ? "block" : "none";
+    document.getElementById("stepSuccess").style.display = "none";
+    [...document.getElementById("stepIndicator").children].forEach((el,i) => {
+      el.className = (i+1===n) ? "fw-semibold text-dark" : "";
+    });
+  }
+
+  // Step 1: departments
+  const deptOptions = document.getElementById("deptOptions");
+  MOCK.departments.forEach(d => {
+    deptOptions.innerHTML += `
+      <div class="col-6 col-md-4">
+        <div class="dept-pill" style="cursor:pointer;" onclick="selectDept('${d.name}', this)">
+          <div class="icon-tile" style="background:var(--info-bg);color:var(--clinical-blue);"><i class="bi bi-hospital"></i></div>
+          <div class="small fw-semibold">${d.name}</div>
+        </div>
+      </div>`;
+  });
+  function selectDept(name, el) {
+    booking.department = name;
+    document.querySelectorAll("#deptOptions .dept-pill").forEach(p => p.style.outline = "none");
+    el.style.outline = "2px solid var(--teal-600)";
+    document.getElementById("step1Next").disabled = false;
+  }
+
+  // Step 2: doctors filtered by department
+  function renderDoctorOptions() {
+    const list = MOCK.doctors.filter(d => d.department === booking.department && d.status === "Active");
+    const box = document.getElementById("doctorOptions");
+    box.innerHTML = list.map(d => `
+      <div class="col-12">
+        <div class="dept-pill" style="cursor:pointer;" onclick="selectDoctor('${d.name}', this)">
+          <div class="avatar-sm">${d.name.split(" ").map(w=>w[0]).slice(0,2).join("")}</div>
+          <div>
+            <div class="fw-semibold small">${d.name}</div>
+            <div class="text-faint" style="font-size:.78rem;">${d.specialization}</div>
+          </div>
+        </div>
+      </div>`).join("") || `<p class="text-muted-soft small">No active doctors in this department right now.</p>`;
+  }
+  function selectDoctor(name, el) {
+    booking.doctor = name;
+    document.querySelectorAll("#doctorOptions .dept-pill").forEach(p => p.style.outline = "none");
+    el.style.outline = "2px solid var(--teal-600)";
+    document.getElementById("step2Next").disabled = false;
+  }
+
+  // Step 3: slots
+  const slotBox = document.getElementById("slotOptions");
+  MOCK.timeSlots.forEach(t => {
+    slotBox.innerHTML += `<button type="button" class="btn btn-sm btn-ghost border slot-btn" onclick="selectSlot('${t}', this)">${t}</button>`;
+  });
+  function selectSlot(t, el) {
+    booking.time = t;
+    document.querySelectorAll(".slot-btn").forEach(b => { b.classList.remove("btn-primary"); b.classList.add("btn-ghost"); });
+    el.classList.remove("btn-ghost"); el.classList.add("btn-primary");
+  }
+
+  function reviewBooking() {
+    booking.date = document.getElementById("apptDate").value;
+    booking.reason = document.getElementById("apptReason").value;
+    if (!booking.date || !booking.reason || !booking.time) {
+      if (!validateForm(document.getElementById("step3"))) return;
+      if (!booking.time) { showToast("Please select a time slot.", "danger"); return; }
+    }
+    document.getElementById("confDept").textContent = booking.department;
+    document.getElementById("confDoctor").textContent = booking.doctor;
+    document.getElementById("confDate").textContent = booking.date;
+    document.getElementById("confTime").textContent = booking.time;
+    document.getElementById("confReason").textContent = booking.reason;
+    goStep(4);
+  }
+
+  async function confirmBooking() {
+    const btn = document.getElementById("confirmBookBtn");
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Booking…`;
+    // TODO: Connect this function to your backend API (AppointmentService.book)
+    // The backend must validate slot availability and prevent double-booking.
+    const result = await AppointmentService.book(booking);
+    setTimeout(() => {
+      document.getElementById("step4").style.display = "none";
+      document.getElementById("successId").textContent = "APT-" + Math.floor(3000 + Math.random()*900);
+      document.getElementById("stepSuccess").style.display = "block";
+    }, 500);
+  }
+
+  // Wire step transitions to render doctor list when entering step 2
+  const originalGoStep = goStep;
+  goStep = function(n) {
+    originalGoStep(n);
+    if (n === 2) renderDoctorOptions();
+  };
+
+  // Min date = today
+  document.getElementById("apptDate").min = new Date().toISOString().split("T")[0];
+</script>
+</body>
+</html>

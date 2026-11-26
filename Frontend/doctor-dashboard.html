@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctor Dashboard — Meridian Health</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><span class="mark">M</span><span class="name">Meridian</span></div>
+    <div class="sidebar-role">Doctor Panel</div>
+    <nav class="sidebar-nav">
+      <a href="doctor-dashboard.html"><i class="bi bi-grid-1x2"></i> My Appointments</a>
+      <a href="visits.html"><i class="bi bi-clipboard2-pulse"></i> Visits</a>
+      <a href="prescriptions.html"><i class="bi bi-capsule"></i> Prescriptions</a>
+      <a href="settings.html"><i class="bi bi-gear"></i> Settings</a>
+    </nav>
+    <div class="sidebar-foot"><a href="index.html"><i class="bi bi-box-arrow-left"></i> Logout</a></div>
+  </aside>
+
+  <div class="main-col">
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="sidebar-toggle" data-sidebar-toggle><i class="bi bi-list"></i></button>
+        <span class="page-title">My Appointments</span>
+      </div>
+      <div class="user-chip"><span class="text-muted-soft small d-none d-sm-inline">Dr. Ananya Rao</span><div class="avatar">AR</div></div>
+    </header>
+
+    <main class="content">
+      <div class="panel mb-4">
+        <div class="panel-head"><h2>Today's Appointments</h2><span class="text-faint small">2026-09-22</span></div>
+        <div class="table-responsive">
+          <table class="table-clean mb-0">
+            <thead><tr><th>Patient</th><th>Time</th><th>Reason</th><th>Status</th><th></th></tr></thead>
+            <tbody id="todayBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="todayEmpty" style="display:none;"><i class="bi bi-calendar-check"></i>No appointments scheduled for today.</div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Upcoming Appointments</h2></div>
+        <div class="table-responsive">
+          <table class="table-clean mb-0">
+            <thead><tr><th>Patient</th><th>Date</th><th>Time</th><th>Reason</th><th>Status</th></tr></thead>
+            <tbody id="upcomingBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="modal fade" id="patientInfoModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title font-display">Patient &amp; Appointment</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body" id="patientInfoBody"></div>
+      <div class="modal-footer" id="patientInfoFooter"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/mockData.js"></script>
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script>
+  const myName = "Dr. Ananya Rao";
+  let mine = MOCK.appointments.filter(a => a.doctor === myName);
+  const TODAY = "2026-09-22";
+
+  function renderLists() {
+    const today = mine.filter(a => a.date === TODAY);
+    const upcoming = mine.filter(a => a.date > TODAY);
+    document.getElementById("todayEmpty").style.display = today.length ? "none" : "block";
+    document.getElementById("todayBody").innerHTML = today.map(a => `
+      <tr>
+        <td class="fw-semibold">${a.patient}</td>
+        <td>${a.time}</td>
+        <td class="small text-muted-soft">${a.reason}</td>
+        <td><span class="badge-status ${statusBadgeClass(a.status)}">${a.status}</span></td>
+        <td class="text-end"><button class="btn btn-sm btn-primary" onclick="openAppt('${a.id}')">Open</button></td>
+      </tr>`).join("");
+    document.getElementById("upcomingBody").innerHTML = upcoming.map(a => `
+      <tr>
+        <td class="fw-semibold">${a.patient}</td>
+        <td>${a.date}</td><td>${a.time}</td>
+        <td class="small text-muted-soft">${a.reason}</td>
+        <td><span class="badge-status ${statusBadgeClass(a.status)}">${a.status}</span></td>
+      </tr>`).join("") || `<tr><td colspan="5" class="text-center text-faint py-3">No upcoming appointments.</td></tr>`;
+  }
+  renderLists();
+
+  function openAppt(id) {
+    const a = mine.find(x => x.id === id);
+    const patient = MOCK.patients.find(p => p.name === a.patient);
+    document.getElementById("patientInfoBody").innerHTML = `
+      <div class="row g-2 small mb-2">
+        <div class="col-5 text-faint">Patient</div><div class="col-7">${a.patient}</div>
+        <div class="col-5 text-faint">Time</div><div class="col-7">${a.time}</div>
+        <div class="col-5 text-faint">Reason</div><div class="col-7">${a.reason}</div>
+        ${patient ? `<div class="col-5 text-faint">Contact</div><div class="col-7">${patient.phone}</div>` : ""}
+        <div class="col-5 text-faint">Status</div><div class="col-7"><span class="badge-status ${statusBadgeClass(a.status)}">${a.status}</span></div>
+      </div>`;
+    document.getElementById("patientInfoFooter").innerHTML = `
+      <button class="btn btn-ghost border" data-bs-dismiss="modal">Close</button>
+      <button class="btn btn-ghost border" onclick="markStatus('${a.id}','No-show')">Mark No-show</button>
+      <button class="btn btn-primary" onclick="startVisit('${a.id}')">Start Visit</button>`;
+    new bootstrap.Modal(document.getElementById("patientInfoModal")).show();
+  }
+
+  async function markStatus(id, status) {
+    // TODO: Connect this function to your backend API (AppointmentService.updateStatus)
+    await AppointmentService.updateStatus(id, status);
+    mine = mine.map(a => a.id === id ? { ...a, status } : a);
+    renderLists();
+    bootstrap.Modal.getInstance(document.getElementById("patientInfoModal")).hide();
+    showToast(`Appointment marked ${status}.`, "success");
+  }
+
+  function startVisit(id) {
+    // In a full build this would deep-link to visits.html?appointment=ID
+    window.location.href = "visits.html";
+  }
+</script>
+</body>
+</html>

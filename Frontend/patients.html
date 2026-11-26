@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patients — Meridian Health</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><span class="mark">M</span><span class="name">Meridian</span></div>
+    <div class="sidebar-role">Admin Panel</div>
+    <nav class="sidebar-nav">
+      <a href="admin-dashboard.html"><i class="bi bi-grid-1x2"></i> Dashboard</a>
+      <a href="doctors.html"><i class="bi bi-person-badge"></i> Doctors</a>
+      <a href="patients.html"><i class="bi bi-people"></i> Patients</a>
+      <a href="departments.html"><i class="bi bi-diagram-3"></i> Departments</a>
+      <a href="appointments.html"><i class="bi bi-calendar2-week"></i> Appointments</a>
+      <a href="visits.html"><i class="bi bi-clipboard2-pulse"></i> Visits</a>
+      <a href="prescriptions.html"><i class="bi bi-capsule"></i> Prescriptions</a>
+      <a href="billing.html"><i class="bi bi-receipt"></i> Billing</a>
+      <a href="audit-logs.html"><i class="bi bi-journal-text"></i> Audit Logs</a>
+      <a href="settings.html"><i class="bi bi-gear"></i> Settings</a>
+    </nav>
+    <div class="sidebar-foot"><a href="index.html"><i class="bi bi-box-arrow-left"></i> Logout</a></div>
+  </aside>
+
+  <div class="main-col">
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="sidebar-toggle" data-sidebar-toggle><i class="bi bi-list"></i></button>
+        <span class="page-title">Patients</span>
+      </div>
+      <div class="user-chip"><span class="text-muted-soft small d-none d-sm-inline">Admin User</span><div class="avatar">AU</div></div>
+    </header>
+
+    <main class="content">
+      <div class="panel">
+        <div class="panel-head flex-wrap gap-2">
+          <h2>All Patients</h2>
+          <div class="d-flex gap-2">
+            <div class="input-group input-group-sm" style="width:220px;">
+              <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+              <input type="text" class="form-control" id="patientSearch" placeholder="Search patients...">
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openAddPatient()" data-bs-toggle="modal" data-bs-target="#patientModal"><i class="bi bi-plus-lg me-1"></i>Add Patient</button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table-clean mb-0">
+            <thead><tr><th>ID</th><th>Name</th><th>DOB</th><th>Gender</th><th>Contact</th><th></th></tr></thead>
+            <tbody id="patientsBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="patientsEmpty" style="display:none;"><i class="bi bi-person-x"></i>No patients match your search.</div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Add/Edit Patient Modal -->
+<div class="modal fade" id="patientModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="patientForm">
+        <div class="modal-header">
+          <h5 class="modal-title font-display" id="patientModalTitle">Add Patient</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="patientId">
+          <div class="mb-3 was-validated-field">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="patientName" required>
+            <div class="invalid-msg">Full name is required.</div>
+          </div>
+          <div class="row g-3">
+            <div class="col-6 was-validated-field">
+              <label class="form-label">Date of Birth</label>
+              <input type="date" class="form-control" id="patientDob" required>
+              <div class="invalid-msg">Required.</div>
+            </div>
+            <div class="col-6 was-validated-field">
+              <label class="form-label">Gender</label>
+              <select class="form-select" id="patientGender" required>
+                <option value="">Select</option><option>Female</option><option>Male</option><option>Other</option>
+              </select>
+              <div class="invalid-msg">Required.</div>
+            </div>
+          </div>
+          <div class="mb-3 mt-3 was-validated-field">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" id="patientEmail" required>
+            <div class="invalid-msg">Valid email required.</div>
+          </div>
+          <div class="mb-3 was-validated-field">
+            <label class="form-label">Phone</label>
+            <input type="tel" class="form-control" id="patientPhone" required>
+            <div class="invalid-msg">Required.</div>
+          </div>
+          <div class="was-validated-field">
+            <label class="form-label">Address</label>
+            <input type="text" class="form-control" id="patientAddress" required>
+            <div class="invalid-msg">Required.</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost border" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Patient</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- View Patient Modal -->
+<div class="modal fade" id="viewPatientModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title font-display">Patient Profile</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body" id="viewPatientBody"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/mockData.js"></script>
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script>
+  let patients = [...MOCK.patients];
+
+  function renderPatients() {
+    const q = document.getElementById("patientSearch").value.toLowerCase();
+    const filtered = patients.filter(p => p.name.toLowerCase().includes(q) || p.id.toLowerCase().includes(q));
+    document.getElementById("patientsEmpty").style.display = filtered.length ? "none" : "block";
+    document.getElementById("patientsBody").innerHTML = filtered.map(p => `
+      <tr>
+        <td class="text-faint">${p.id}</td>
+        <td class="fw-semibold">${p.name}</td>
+        <td>${p.dob}</td>
+        <td>${p.gender}</td>
+        <td class="small">${p.phone}<br><span class="text-faint">${p.email}</span></td>
+        <td class="text-end">
+          <button class="btn btn-sm btn-ghost border" onclick="viewPatient('${p.id}')"><i class="bi bi-eye"></i></button>
+          <button class="btn btn-sm btn-ghost border" onclick="editPatient('${p.id}')"><i class="bi bi-pencil"></i></button>
+        </td>
+      </tr>`).join("");
+  }
+  renderPatients();
+  document.getElementById("patientSearch").addEventListener("input", renderPatients);
+
+  function openAddPatient() {
+    document.getElementById("patientForm").reset();
+    document.getElementById("patientId").value = "";
+    document.getElementById("patientModalTitle").textContent = "Add Patient";
+  }
+  function editPatient(id) {
+    const p = patients.find(x => x.id === id);
+    document.getElementById("patientModalTitle").textContent = "Edit Patient";
+    document.getElementById("patientId").value = p.id;
+    document.getElementById("patientName").value = p.name;
+    document.getElementById("patientDob").value = p.dob;
+    document.getElementById("patientGender").value = p.gender;
+    document.getElementById("patientEmail").value = p.email;
+    document.getElementById("patientPhone").value = p.phone;
+    document.getElementById("patientAddress").value = p.address;
+    new bootstrap.Modal(document.getElementById("patientModal")).show();
+  }
+  function viewPatient(id) {
+    const p = patients.find(x => x.id === id);
+    document.getElementById("viewPatientBody").innerHTML = `
+      <div class="row g-2 small">
+        <div class="col-6 text-faint">Patient ID</div><div class="col-6">${p.id}</div>
+        <div class="col-6 text-faint">Name</div><div class="col-6">${p.name}</div>
+        <div class="col-6 text-faint">Date of Birth</div><div class="col-6">${p.dob}</div>
+        <div class="col-6 text-faint">Gender</div><div class="col-6">${p.gender}</div>
+        <div class="col-6 text-faint">Phone</div><div class="col-6">${p.phone}</div>
+        <div class="col-6 text-faint">Email</div><div class="col-6">${p.email}</div>
+        <div class="col-6 text-faint">Address</div><div class="col-6">${p.address}</div>
+      </div>
+      <p class="text-faint small mt-3 mb-0"><i class="bi bi-shield-lock me-1"></i>Detailed medical history is not shown here — access is restricted to authorized clinical staff.</p>`;
+    new bootstrap.Modal(document.getElementById("viewPatientModal")).show();
+  }
+
+  document.getElementById("patientForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!validateForm(e.target)) return;
+    const id = document.getElementById("patientId").value;
+    const payload = {
+      id: id || "PAT-" + Math.floor(2000 + Math.random() * 900),
+      name: document.getElementById("patientName").value,
+      dob: document.getElementById("patientDob").value,
+      gender: document.getElementById("patientGender").value,
+      email: document.getElementById("patientEmail").value,
+      phone: document.getElementById("patientPhone").value,
+      address: document.getElementById("patientAddress").value,
+    };
+    if (id) {
+      await PatientService.update(id, payload); // TODO: connect to backend
+      patients = patients.map(p => p.id === id ? payload : p);
+      showToast("Patient updated.", "success");
+    } else {
+      await PatientService.create(payload); // TODO: connect to backend
+      patients.unshift(payload);
+      showToast("Patient added.", "success");
+    }
+    renderPatients();
+    bootstrap.Modal.getInstance(document.getElementById("patientModal")).hide();
+  });
+</script>
+</body>
+</html>

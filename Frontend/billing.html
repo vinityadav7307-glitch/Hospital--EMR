@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Billing — Meridian Health</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><span class="mark">M</span><span class="name">Meridian</span></div>
+    <div class="sidebar-role">Admin Panel</div>
+    <nav class="sidebar-nav">
+      <a href="admin-dashboard.html"><i class="bi bi-grid-1x2"></i> Dashboard</a>
+      <a href="doctors.html"><i class="bi bi-person-badge"></i> Doctors</a>
+      <a href="patients.html"><i class="bi bi-people"></i> Patients</a>
+      <a href="departments.html"><i class="bi bi-diagram-3"></i> Departments</a>
+      <a href="appointments.html"><i class="bi bi-calendar2-week"></i> Appointments</a>
+      <a href="visits.html"><i class="bi bi-clipboard2-pulse"></i> Visits</a>
+      <a href="prescriptions.html"><i class="bi bi-capsule"></i> Prescriptions</a>
+      <a href="billing.html"><i class="bi bi-receipt"></i> Billing</a>
+      <a href="audit-logs.html"><i class="bi bi-journal-text"></i> Audit Logs</a>
+      <a href="settings.html"><i class="bi bi-gear"></i> Settings</a>
+    </nav>
+    <div class="sidebar-foot"><a href="index.html"><i class="bi bi-box-arrow-left"></i> Logout</a></div>
+  </aside>
+
+  <div class="main-col">
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="sidebar-toggle" data-sidebar-toggle><i class="bi bi-list"></i></button>
+        <span class="page-title">Billing</span>
+      </div>
+      <div class="user-chip"><span class="text-muted-soft small d-none d-sm-inline">Admin User</span><div class="avatar">AU</div></div>
+    </header>
+
+    <main class="content">
+      <div class="row g-3 mb-4">
+        <div class="col-sm-4">
+          <div class="stat-card"><div class="stat-label">Total Billed</div><div class="stat-value" id="totalBilled">—</div></div>
+        </div>
+        <div class="col-sm-4">
+          <div class="stat-card"><div class="stat-label">Paid</div><div class="stat-value" style="color:var(--success);" id="totalPaid">—</div></div>
+        </div>
+        <div class="col-sm-4">
+          <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value" style="color:var(--warning);" id="totalPending">—</div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head flex-wrap gap-2">
+          <h2>Bills</h2>
+          <div class="d-flex gap-2 flex-wrap">
+            <select class="form-select form-select-sm" id="billStatusFilter" style="width:auto;">
+              <option value="">All Statuses</option>
+              <option>Pending</option><option>Paid</option><option>Cancelled</option>
+            </select>
+            <div class="input-group input-group-sm" style="width:200px;">
+              <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+              <input type="text" class="form-control" id="billSearch" placeholder="Search patient...">
+            </div>
+            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#billModal"><i class="bi bi-plus-lg me-1"></i>Add Bill</button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table-clean mb-0">
+            <thead><tr><th>Bill ID</th><th>Patient</th><th>Visit ID</th><th>Amount</th><th>Status</th><th>Date</th><th></th></tr></thead>
+            <tbody id="billBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="modal fade" id="billModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="billForm">
+        <div class="modal-header"><h5 class="modal-title font-display">Add Bill</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <div class="mb-3 was-validated-field">
+            <label class="form-label">Patient</label>
+            <select class="form-select" id="billPatient" required></select>
+            <div class="invalid-msg">Select a patient.</div>
+          </div>
+          <div class="mb-3 was-validated-field">
+            <label class="form-label">Visit ID</label>
+            <input type="text" class="form-control" id="billVisitId" required placeholder="VIS-4001">
+            <div class="invalid-msg">Required.</div>
+          </div>
+          <div class="was-validated-field">
+            <label class="form-label">Total Amount (₹)</label>
+            <input type="number" min="0" class="form-control" id="billAmount" required>
+            <div class="invalid-msg">Enter a valid amount.</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost border" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Bill</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="viewBillModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title font-display">Bill Details</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body" id="viewBillBody"></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost border" data-bs-dismiss="modal">Close</button>
+        <button class="btn btn-primary" onclick="window.print()"><i class="bi bi-printer me-1"></i>Print Bill</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/mockData.js"></script>
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script>
+  let bills = [...MOCK.bills];
+  const billPatientSel = document.getElementById("billPatient");
+  MOCK.patients.forEach(p => billPatientSel.innerHTML += `<option value="${p.name}">${p.name}</option>`);
+
+  function renderBills() {
+    const q = document.getElementById("billSearch").value.toLowerCase();
+    const status = document.getElementById("billStatusFilter").value;
+    const filtered = bills.filter(b => (!status || b.status === status) && b.patient.toLowerCase().includes(q));
+    document.getElementById("billBody").innerHTML = filtered.map(b => `
+      <tr>
+        <td class="text-faint">${b.id}</td>
+        <td class="fw-semibold">${b.patient}</td>
+        <td>${b.visitId}</td>
+        <td>${formatCurrency(b.amount)}</td>
+        <td><span class="badge-status ${statusBadgeClass(b.status)}">${b.status}</span></td>
+        <td>${b.date}</td>
+        <td class="text-end"><button class="btn btn-sm btn-ghost border" onclick="viewBill('${b.id}')"><i class="bi bi-eye"></i></button></td>
+      </tr>`).join("");
+
+    document.getElementById("totalBilled").textContent = formatCurrency(bills.reduce((s,b)=>s+b.amount,0));
+    document.getElementById("totalPaid").textContent = formatCurrency(bills.filter(b=>b.status==="Paid").reduce((s,b)=>s+b.amount,0));
+    document.getElementById("totalPending").textContent = formatCurrency(bills.filter(b=>b.status==="Pending").reduce((s,b)=>s+b.amount,0));
+  }
+  renderBills();
+  document.getElementById("billSearch").addEventListener("input", renderBills);
+  document.getElementById("billStatusFilter").addEventListener("change", renderBills);
+
+  function viewBill(id) {
+    const b = bills.find(x => x.id === id);
+    document.getElementById("viewBillBody").innerHTML = `
+      <div class="row g-2 small">
+        <div class="col-5 text-faint">Bill ID</div><div class="col-7">${b.id}</div>
+        <div class="col-5 text-faint">Patient</div><div class="col-7">${b.patient}</div>
+        <div class="col-5 text-faint">Visit ID</div><div class="col-7">${b.visitId}</div>
+        <div class="col-5 text-faint">Amount</div><div class="col-7">${formatCurrency(b.amount)}</div>
+        <div class="col-5 text-faint">Status</div><div class="col-7"><span class="badge-status ${statusBadgeClass(b.status)}">${b.status}</span></div>
+        <div class="col-5 text-faint">Date</div><div class="col-7">${b.date}</div>
+      </div>`;
+    new bootstrap.Modal(document.getElementById("viewBillModal")).show();
+  }
+
+  document.getElementById("billForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!validateForm(e.target)) return;
+    const payload = {
+      id: "BILL-" + Math.floor(6000 + Math.random()*900),
+      visitId: document.getElementById("billVisitId").value,
+      patient: document.getElementById("billPatient").value,
+      amount: Number(document.getElementById("billAmount").value),
+      status: "Pending",
+      date: new Date().toISOString().split("T")[0],
+    };
+    // TODO: Connect this function to your backend API (BillingService.create). Do not integrate a real payment gateway here.
+    await BillingService.create(payload);
+    bills.unshift(payload);
+    renderBills();
+    e.target.reset();
+    bootstrap.Modal.getInstance(document.getElementById("billModal")).hide();
+    showToast("Bill added.", "success");
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meridian Health — Hospital Appointment &amp; EMR Lite</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top py-3">
+  <div class="container">
+    <a class="navbar-brand-custom" href="index.html">
+      <span class="mark"><i class="bi bi-heart-pulse"></i></span> Meridian Health
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navMain">
+      <ul class="navbar-nav me-4 gap-lg-4">
+        <li class="nav-item"><a class="nav-link text-body" href="#services">Services</a></li>
+        <li class="nav-item"><a class="nav-link text-body" href="#departments">Departments</a></li>
+        <li class="nav-item"><a class="nav-link text-body" href="#why-us">Why Choose Us</a></li>
+      </ul>
+      <div class="d-flex gap-2">
+        <a href="login.html" class="btn btn-ghost">Login</a>
+        <a href="register.html" class="btn btn-primary">Register</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-7">
+        <p class="section-eyebrow mb-2">Appointments &amp; records, in one place</p>
+        <h1 class="font-display mb-3">Care coordination that keeps every visit connected.</h1>
+        <p class="lead mb-4">Meridian Health brings patients, doctors and front-desk staff onto a single system — booking, visit notes, prescriptions and billing, all in sync.</p>
+        <div class="d-flex flex-wrap gap-3">
+          <a href="book-appointment.html" class="btn btn-primary btn-lg px-4"><i class="bi bi-calendar-check me-1"></i> Book Appointment</a>
+          <a href="login.html" class="btn btn-outline-primary btn-lg px-4">Login to Portal</a>
+        </div>
+        <div class="d-flex gap-4 mt-5 text-muted-soft small">
+          <div><strong class="text-dark d-block fs-5 font-display">6</strong>Departments</div>
+          <div><strong class="text-dark d-block fs-5 font-display">23+</strong>Specialist doctors</div>
+          <div><strong class="text-dark d-block fs-5 font-display">10k+</strong>Patients served</div>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="panel p-4">
+          <p class="text-uppercase small fw-semibold text-muted-soft mb-3">Today at Meridian</p>
+          <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+            <div><div class="fw-semibold">Dr. Ananya Rao</div><div class="small text-muted-soft">Cardiology</div></div>
+            <span class="badge-status badge-confirmed">10:00 AM</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+            <div><div class="fw-semibold">Dr. Meera Iyer</div><div class="small text-muted-soft">Pediatrics</div></div>
+            <span class="badge-status badge-scheduled">11:30 AM</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center py-2">
+            <div><div class="fw-semibold">Dr. Kavita Nair</div><div class="small text-muted-soft">Neurology</div></div>
+            <span class="badge-status badge-scheduled">2:00 PM</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Services -->
+<section id="services" class="py-5 my-4">
+  <div class="container">
+    <p class="section-eyebrow mb-1">What we offer</p>
+    <h2 class="font-display mb-4">Services built around the patient journey</h2>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="feature-card">
+          <i class="bi bi-calendar2-week mb-3 d-block"></i>
+          <h3 class="h5 font-display">Easy Appointment Booking</h3>
+          <p class="text-muted-soft mb-0 small">Choose a department, pick a doctor and reserve an open time slot in minutes.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <i class="bi bi-clipboard2-pulse mb-3 d-block"></i>
+          <h3 class="h5 font-display">Digital Visit Records</h3>
+          <p class="text-muted-soft mb-0 small">Doctors log diagnosis, treatment notes and follow-ups tied to each visit.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <i class="bi bi-receipt mb-3 d-block"></i>
+          <h3 class="h5 font-display">Transparent Billing</h3>
+          <p class="text-muted-soft mb-0 small">View bills, payment status and history for every visit in your portal.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Departments -->
+<section id="departments" class="py-5 my-4 bg-white border-top border-bottom">
+  <div class="container py-3">
+    <p class="section-eyebrow mb-1">Specialties</p>
+    <h2 class="font-display mb-4">Departments</h2>
+    <div class="row g-3" id="deptGrid"></div>
+  </div>
+</section>
+
+<!-- Why choose us -->
+<section id="why-us" class="py-5 my-4">
+  <div class="container">
+    <div class="row g-5 align-items-center">
+      <div class="col-lg-6">
+        <p class="section-eyebrow mb-1">Why choose us</p>
+        <h2 class="font-display mb-4">A hospital system that stays organized, so your care doesn't fall through the cracks</h2>
+        <ul class="list-unstyled d-grid gap-3">
+          <li class="d-flex gap-3"><i class="bi bi-check2-circle text-success fs-5"></i><span>Every appointment, visit and prescription linked to one patient record.</span></li>
+          <li class="d-flex gap-3"><i class="bi bi-check2-circle text-success fs-5"></i><span>Doctors see full visit history before every consultation.</span></li>
+          <li class="d-flex gap-3"><i class="bi bi-check2-circle text-success fs-5"></i><span>Admins track departments, staffing and revenue from one dashboard.</span></li>
+        </ul>
+      </div>
+      <div class="col-lg-6">
+        <div class="panel p-4">
+          <div class="row g-3">
+            <div class="col-6"><div class="stat-card"><div class="stat-label">Avg. wait time</div><div class="stat-value">12 min</div></div></div>
+            <div class="col-6"><div class="stat-card"><div class="stat-label">Patient satisfaction</div><div class="stat-value">4.7/5</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-5">
+  <div class="container">
+    <div class="panel p-5 text-center" style="background:var(--pine-900);border:none;">
+      <h2 class="font-display text-white mb-2">Ready to book your visit?</h2>
+      <p class="text-white-50 mb-4">Create a free patient account and schedule your first appointment today.</p>
+      <div class="d-flex justify-content-center gap-3">
+        <a href="register.html" class="btn btn-accent btn-lg px-4">Create Account</a>
+        <a href="book-appointment.html" class="btn btn-outline-light btn-lg px-4">Book Appointment</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="navbar-brand-custom text-white mb-2"><span class="mark"><i class="bi bi-heart-pulse"></i></span> Meridian Health</div>
+        <p class="small mb-0">Hospital Appointment &amp; EMR Lite — a college DBMS project frontend.</p>
+      </div>
+      <div class="col-md-4">
+        <h3 class="h6 text-white">Quick Links</h3>
+        <ul class="list-unstyled small d-grid gap-2">
+          <li><a href="login.html">Login</a></li>
+          <li><a href="register.html">Register</a></li>
+          <li><a href="book-appointment.html">Book Appointment</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h3 class="h6 text-white">Contact</h3>
+        <p class="small mb-1"><i class="bi bi-telephone me-2"></i>+91 20 4567 8900</p>
+        <p class="small mb-0"><i class="bi bi-envelope me-2"></i>care@meridianhealth.example</p>
+      </div>
+    </div>
+    <hr class="border-secondary my-4">
+    <p class="small mb-0">© 2026 Meridian Health. Demo project — not a real hospital.</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/mockData.js"></script>
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script>
+  // Render department cards from mock data
+  const deptGrid = document.getElementById("deptGrid");
+  MOCK.departments.forEach((d) => {
+    deptGrid.innerHTML += `
+      <div class="col-md-4">
+        <div class="dept-pill">
+          <div class="icon-tile" style="background:var(--info-bg);color:var(--clinical-blue);"><i class="bi bi-hospital"></i></div>
+          <div>
+            <div class="fw-semibold">${d.name}</div>
+            <div class="small text-muted-soft">${d.description} · ${d.doctors} doctors</div>
+          </div>
+        </div>
+      </div>`;
+  });
+</script>
+</body>
+</html>

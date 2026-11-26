@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Meridian Health</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand"><span class="mark">M</span><span class="name">Meridian</span></div>
+    <div class="sidebar-role">Admin Panel</div>
+    <nav class="sidebar-nav">
+      <a href="admin-dashboard.html"><i class="bi bi-grid-1x2"></i> Dashboard</a>
+      <a href="doctors.html"><i class="bi bi-person-badge"></i> Doctors</a>
+      <a href="patients.html"><i class="bi bi-people"></i> Patients</a>
+      <a href="departments.html"><i class="bi bi-diagram-3"></i> Departments</a>
+      <a href="appointments.html"><i class="bi bi-calendar2-week"></i> Appointments</a>
+      <a href="visits.html"><i class="bi bi-clipboard2-pulse"></i> Visits</a>
+      <a href="prescriptions.html"><i class="bi bi-capsule"></i> Prescriptions</a>
+      <a href="billing.html"><i class="bi bi-receipt"></i> Billing</a>
+      <a href="audit-logs.html"><i class="bi bi-journal-text"></i> Audit Logs</a>
+      <a href="settings.html"><i class="bi bi-gear"></i> Settings</a>
+    </nav>
+    <div class="sidebar-foot"><a href="index.html"><i class="bi bi-box-arrow-left"></i> Logout</a></div>
+  </aside>
+
+  <div class="main-col">
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="sidebar-toggle" data-sidebar-toggle><i class="bi bi-list"></i></button>
+        <span class="page-title">Dashboard</span>
+      </div>
+      <div class="user-chip">
+        <span class="text-muted-soft small d-none d-sm-inline">Admin User</span>
+        <div class="avatar">AU</div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <div class="row g-3 mb-4" id="statRow"><!-- stat cards injected by JS --></div>
+
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div class="panel mb-4">
+            <div class="panel-head">
+              <h2>Recent Appointments</h2>
+              <a href="appointments.html" class="small">View all <i class="bi bi-arrow-right"></i></a>
+            </div>
+            <div class="table-responsive">
+              <table class="table-clean mb-0">
+                <thead><tr><th>Patient</th><th>Doctor</th><th>Date</th><th>Time</th><th>Status</th></tr></thead>
+                <tbody id="recentAppointmentsBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h2>Appointment Overview</h2></div>
+            <div class="panel-body">
+              <canvas id="apptChart" height="90"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="panel mb-4">
+            <div class="panel-head"><h2>Department Statistics</h2></div>
+            <div class="panel-body" id="deptStats"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h2>Recent Activity</h2></div>
+            <div class="panel-body" id="recentActivity" style="max-height:280px;overflow-y:auto;"></div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="js/mockData.js"></script>
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script>
+  // ---- Stat cards ----
+  const stats = [
+    { label: "Total Patients", value: MOCK.patients.length, icon: "bi-people", color: "var(--clinical-blue)", bg: "var(--info-bg)", delta: "+4 this week", up: true },
+    { label: "Total Doctors", value: MOCK.doctors.length, icon: "bi-person-badge", color: "var(--teal-600)", bg: "var(--success-bg)", delta: "+1 this month", up: true },
+    { label: "Today's Appointments", value: MOCK.appointments.filter(a => a.date === "2026-09-22").length, icon: "bi-calendar2-week", color: "var(--warning)", bg: "var(--warning-bg)", delta: "2 pending", up: true },
+    { label: "Completed Visits", value: MOCK.visits.length, icon: "bi-clipboard2-check", color: "var(--success)", bg: "var(--success-bg)", delta: "This week", up: true },
+    { label: "Pending Appointments", value: MOCK.appointments.filter(a => a.status === "Scheduled").length, icon: "bi-hourglass-split", color: "var(--warning)", bg: "var(--warning-bg)", delta: "Awaiting confirmation", up: false },
+    { label: "Total Revenue", value: formatCurrency(MOCK.bills.reduce((s,b)=>s+b.amount,0)), icon: "bi-currency-rupee", color: "var(--pine-800)", bg: "#EAF0EE", delta: "+12% vs last month", up: true },
+  ];
+  const statRow = document.getElementById("statRow");
+  stats.forEach(s => {
+    statRow.innerHTML += `
+      <div class="col-sm-6 col-xl-4">
+        <div class="stat-card">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="stat-label">${s.label}</div>
+              <div class="stat-value">${s.value}</div>
+              <div class="stat-delta ${s.up ? 'up':'down'}"><i class="bi bi-arrow-${s.up?'up':'down'}-short"></i>${s.delta}</div>
+            </div>
+            <div class="stat-icon" style="background:${s.bg};color:${s.color};"><i class="bi ${s.icon}"></i></div>
+          </div>
+        </div>
+      </div>`;
+  });
+
+  // ---- Recent appointments table ----
+  const body = document.getElementById("recentAppointmentsBody");
+  MOCK.appointments.slice(0,5).forEach(a => {
+    body.innerHTML += `<tr>
+      <td>${a.patient}</td><td>${a.doctor}</td><td>${a.date}</td><td>${a.time}</td>
+      <td><span class="badge-status ${statusBadgeClass(a.status)}">${a.status}</span></td>
+    </tr>`;
+  });
+
+  // ---- Department stats ----
+  const deptStats = document.getElementById("deptStats");
+  MOCK.departments.forEach(d => {
+    deptStats.innerHTML += `
+      <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+        <span class="small">${d.name}</span>
+        <span class="small fw-semibold">${d.doctors} doctors</span>
+      </div>`;
+  });
+
+  // ---- Recent activity from audit log ----
+  const activity = document.getElementById("recentActivity");
+  MOCK.auditLogs.slice(0,5).forEach(l => {
+    activity.innerHTML += `
+      <div class="d-flex gap-2 py-2 border-bottom">
+        <i class="bi bi-dot fs-4 text-muted-soft"></i>
+        <div class="small"><strong>${l.action}</strong> ${l.entityType} <span class="text-muted-soft">${l.entityId}</span><br><span class="text-faint">${l.timestamp}</span></div>
+      </div>`;
+  });
+
+  // ---- Chart: appointments by status ----
+  const statusCounts = {};
+  MOCK.appointments.forEach(a => statusCounts[a.status] = (statusCounts[a.status]||0)+1);
+  new Chart(document.getElementById("apptChart"), {
+    type: "bar",
+    data: {
+      labels: Object.keys(statusCounts),
+      datasets: [{ label: "Appointments", data: Object.values(statusCounts), backgroundColor: "#2C7A6C", borderRadius: 6, maxBarThickness: 42 }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+  });
+</script>
+</body>
+</html>
